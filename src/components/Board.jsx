@@ -8,7 +8,7 @@ export default function Board({ board = [], handleClick }) {
     return (
         <div className={styles.board}>
             {squares.map((_, i) => (
-                <Square key={i} value={board[i]} handleClick={(event) => handleClick(i)} />
+                <Square key={i} value={board[i]} handleClick={event => handleClick(i)} />
             ))}            
         </div>
     )

@@ -1,3 +1,5 @@
+import { findBestMove } from "./ai";
+
 const calculateWinner = (board) => {
     const winnerSet = [
         [0, 1, 2],
@@ -26,4 +28,16 @@ const calculateWinner = (board) => {
     }
 }
 
-export {calculateWinner}
+const getNextMove = (mode, board = null) => {
+    let nextMove = null
+    if (mode === "hard" && board) nextMove = findBestMove(board)
+    else {
+        const availableMoves = board
+            .map((val, idx) => val === null ? idx : null)
+            .filter(val => val !== null);
+        nextMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    }
+    return nextMove
+}
+
+export {calculateWinner, getNextMove}
