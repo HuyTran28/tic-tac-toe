@@ -1,20 +1,67 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Board from "./Board";
 import { getNextMove } from "../utils/gameLogic";
 import { calculateWinner } from "../utils/gameLogic";
 import GameInfo from "./GameInfo";
+import ScoreBoard from "./ScoreBoard";
+
+const SCORE_KEY = "scoreboard";
+
+function getInitialScore() {
+    const savedScore = localStorage.getItem(SCORE_KEY);
+    if (savedScore) {
+        return JSON.parse(savedScore);
+    }
+    return {
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        currentWinStreak: 0
+    };
+}
 
 export default function Game() {
     const [board, setBoard] = useState(Array(9).fill(null));
     const [xIsNext, setXIsNext] = useState(true);
     const [winner, setWinner] = useState(null);
     const [mode, setMode] = useState("easy"); // easy, hard
+    
     const [totalPosNum, setTotalPosNum] = useState(0);
     const [durationMs, setDurationMs] = useState(0);
 
+    const [{ wins, losses, draws, currentWinStreak }, setScore] = useState(getInitialScore());
+
+    useEffect(() => {
+        localStorage.setItem(SCORE_KEY, JSON.stringify({ wins, losses, draws, currentWinStreak }));
+    }, [wins, losses, draws, currentWinStreak]);
+
+    useEffect(() => {
+        if (!winner) return;
+
+        if (winner === "X") {
+            setScore(preScore => ({
+                ...preScore,
+                wins: preScore.wins + 1,
+                currentWinStreak: preScore.currentWinStreak + 1
+            }));
+        } else if (winner === "O") {
+            setScore(preScore => ({
+                ...preScore,
+                losses: preScore.losses + 1,
+                currentWinStreak: 0
+            }));
+        } else {
+            setScore(preScore => ({
+                ...preScore,
+                draws: preScore.draws + 1,
+                currentWinStreak: 0
+            }));
+        }
+    }, [winner])
+
     useEffect(() => {
         const gameWinner = calculateWinner(board)
-        setWinner(gameWinner)
+        setWinner(gameWinner);
     }, [board])
 
     useEffect(() => {
@@ -49,6 +96,8 @@ export default function Game() {
     const resetGame = () => {
         const newBoard = Array(9).fill(null)
         setBoard(newBoard)
+        setWinner(null)
+        setXIsNext(true)
     }
     
     return (
@@ -62,6 +111,12 @@ export default function Game() {
                 xIsNext={xIsNext}
                 totalPosNum={totalPosNum}
                 durationMs={durationMs}    
+            />
+            <ScoreBoard 
+                wins={wins} 
+                losses={losses} 
+                draws={draws} 
+                currentWinStreak={currentWinStreak} 
             />
         </>
     )

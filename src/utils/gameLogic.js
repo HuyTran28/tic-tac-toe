@@ -34,7 +34,7 @@ const getNextMove = (mode, board = null) => {
         const availableMoves = board
             .map((val, idx) => val === null ? idx : null)
             .filter(val => val !== null);
-        return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        return {move: availableMoves[Math.floor(Math.random() * availableMoves.length)]};
     }
 }
 
