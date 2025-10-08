@@ -9,6 +9,8 @@ export default function Game() {
     const [xIsNext, setXIsNext] = useState(true);
     const [winner, setWinner] = useState(null);
     const [mode, setMode] = useState("easy"); // easy, hard
+    const [totalPosNum, setTotalPosNum] = useState(0);
+    const [durationMs, setDurationMs] = useState(0);
 
     useEffect(() => {
         const gameWinner = calculateWinner(board)
@@ -18,12 +20,17 @@ export default function Game() {
     useEffect(() => {
         if (xIsNext || winner) return;
 
-        const move = getNextMove(mode, board);
+        const {move, totalPosNum, durationMs} = getNextMove(mode, board);
         if (move !== null) {
             const newBoard = board.slice();
             newBoard[move] = "O"; // AI move
             setBoard(newBoard);
             setXIsNext(true);
+
+            if (mode === "hard") {
+                setTotalPosNum(totalPosNum);
+                setDurationMs(durationMs);
+            }
         }
     }, [xIsNext])
 
@@ -47,7 +54,15 @@ export default function Game() {
     return (
         <>
             <Board board={board} handleClick={chooseSquare} />
-            <GameInfo winner={winner} resetGame={resetGame} mode={mode} setMode={setMode} />
+            <GameInfo 
+                winner={winner} 
+                resetGame={resetGame} 
+                mode={mode} 
+                setMode={setMode} 
+                xIsNext={xIsNext}
+                totalPosNum={totalPosNum}
+                durationMs={durationMs}    
+            />
         </>
     )
 }

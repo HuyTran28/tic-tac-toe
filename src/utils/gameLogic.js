@@ -29,15 +29,13 @@ const calculateWinner = (board) => {
 }
 
 const getNextMove = (mode, board = null) => {
-    let nextMove = null
-    if (mode === "hard" && board) nextMove = findBestMove(board)
+    if (mode === "hard" && board) return findBestMove(board)
     else {
         const availableMoves = board
             .map((val, idx) => val === null ? idx : null)
             .filter(val => val !== null);
-        nextMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        return availableMoves[Math.floor(Math.random() * availableMoves.length)];
     }
-    return nextMove
 }
 
 export {calculateWinner, getNextMove}
