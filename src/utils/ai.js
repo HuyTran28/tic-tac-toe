@@ -1,7 +1,7 @@
 import { calculateWinner } from "./gameLogic";
 
 const minimax = (board, depth, isMaximizing, alpha=-Infinity, beta=Infinity) => {
-    const winner = calculateWinner(board);
+    const {winner, combination} = calculateWinner(board);
     
     // AI is "O", Human is "X"
     if (winner) {

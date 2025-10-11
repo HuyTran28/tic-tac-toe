@@ -19,13 +19,16 @@ const calculateWinner = (board) => {
             board[a] === board[b] &&
             board[a] === board[c]
         ) {
-            return board[a];
+            return {winner: board[a], combination: set};
         }
     }
 
     if (!board.includes(null)) {
-        return 'Draw';
+        return {winner: 'Draw', combination: []};
     }
+
+    // Always return an object
+    return {winner: null, combination: []};
 }
 
 const getNextMove = (mode, board = null) => {

@@ -24,6 +24,7 @@ export default function Game() {
     const [board, setBoard] = useState(Array(9).fill(null));
     const [xIsNext, setXIsNext] = useState(true);
     const [winner, setWinner] = useState(null);
+    const [winnerCombination, setWinnerCombination] = useState([]);
     const [mode, setMode] = useState("easy"); // easy, hard
     
     const [totalPosNum, setTotalPosNum] = useState(0);
@@ -60,8 +61,9 @@ export default function Game() {
     }, [winner])
 
     useEffect(() => {
-        const gameWinner = calculateWinner(board)
-        setWinner(gameWinner);
+        const {winner, combination} = calculateWinner(board)
+        setWinner(winner);
+        setWinnerCombination(combination);
     }, [board])
 
     useEffect(() => {
@@ -102,7 +104,11 @@ export default function Game() {
     
     return (
         <>
-            <Board board={board} handleClick={chooseSquare} />
+            <Board 
+                board={board} 
+                handleClick={chooseSquare} 
+                winnerCombination={winnerCombination}
+            />
             <GameInfo 
                 winner={winner} 
                 resetGame={resetGame} 
