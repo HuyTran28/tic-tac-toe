@@ -30,4 +30,4 @@ Use the toggle button to switch between difficulty levels:
 - Easy: The AI makes random moves.
 - Hard: The AI uses the Minimax algorithm to make optimal moves.
 
-# [Deployment Production](https://tic-tac-toe-ruby-pi.vercel.app/)
+# [Deployment Production](https://tic-tac-ju3h8tcej-huy-tran-cams-projects.vercel.app)
