@@ -75,7 +75,9 @@ const findBestMove = (board) => {
         }
     }
 
-    const durationMs = performance.now() - start;
+    const end = performance.now();
+    const durationMs = end - start;
+
     return {move, totalPosNum, durationMs};
 }
 

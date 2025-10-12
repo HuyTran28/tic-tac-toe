@@ -1,11 +1,13 @@
 .ToggleModeGroup {
     display: flex;
-    justify-content: center;
     align-items: center;
-    margin: 0; 
-    gap: 12px; 
-    padding: 8px 0;
-    background: #f0f4f8;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    gap: 12px;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 1rem;
+    font-family: inherit;
 }

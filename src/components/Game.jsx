@@ -4,6 +4,7 @@ import { getNextMove } from "../utils/gameLogic";
 import { calculateWinner } from "../utils/gameLogic";
 import GameInfo from "./GameInfo";
 import ScoreBoard from "./ScoreBoard";
+import styles from './Game.module.css'; // Add this import
 
 const SCORE_KEY = "scoreboard";
 
@@ -100,15 +101,25 @@ export default function Game() {
         setBoard(newBoard)
         setWinner(null)
         setXIsNext(true)
+        setTotalPosNum(0)
+        setDurationMs(0)
     }
     
     return (
         <>
-            <Board 
-                board={board} 
-                handleClick={chooseSquare} 
-                winnerCombination={winnerCombination}
-            />
+            <div className={styles.gameContainer}>
+                <Board 
+                    board={board} 
+                    handleClick={chooseSquare} 
+                    winnerCombination={winnerCombination}
+                />
+                <ScoreBoard 
+                    wins={wins} 
+                    losses={losses} 
+                    draws={draws} 
+                    currentWinStreak={currentWinStreak} 
+                />
+            </div>
             <GameInfo 
                 winner={winner} 
                 resetGame={resetGame} 
@@ -117,12 +128,6 @@ export default function Game() {
                 xIsNext={xIsNext}
                 totalPosNum={totalPosNum}
                 durationMs={durationMs}    
-            />
-            <ScoreBoard 
-                wins={wins} 
-                losses={losses} 
-                draws={draws} 
-                currentWinStreak={currentWinStreak} 
             />
         </>
     )
