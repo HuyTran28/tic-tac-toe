@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useRef } from "react";
 import Board from "./Board";
 import { getNextMove } from "../utils/gameLogic";
 import { calculateWinner } from "../utils/gameLogic";
@@ -23,15 +23,51 @@ function getInitialScore() {
 
 export default function Game() {
     const [board, setBoard] = useState(Array(9).fill(null));
-    const [xIsNext, setXIsNext] = useState(true);
+    const [isPlayerTurn, setIsPlayerTurn] = useState(false);
     const [winner, setWinner] = useState(null);
     const [winnerCombination, setWinnerCombination] = useState([]);
-    const [mode, setMode] = useState("easy"); // easy, hard
-    
+    // const [mode, setMode] = useState("easy"); // easy, hard
+    const wsRef = useRef(null);
+    const playerRef = useRef(null);
+
     const [totalPosNum, setTotalPosNum] = useState(0);
     const [durationMs, setDurationMs] = useState(0);
 
     const [{ wins, losses, draws, currentWinStreak }, setScore] = useState(getInitialScore());
+
+    useEffect(() => {
+        if (wsRef.current) return;
+
+        const ws = new WebSocket("ws://localhost:8080");
+        wsRef.current = ws;
+
+        ws.onopen = () => {
+            ws.send(JSON.stringify({   
+                type: 'join',
+            }));        
+        }
+
+        ws.onmessage = (event) => {
+            const { type, data } = JSON.parse(event.data);
+            switch (type) {
+                case 'start':
+                    playerRef.current = data.player;
+                    setIsPlayerTurn(data.player === 'X');
+                    break;
+                case 'display':
+                    setBoard(data.board);
+                    setIsPlayerTurn(data.nextPlayer === playerRef.current);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return () => {
+            ws.close();
+            wsRef.current = null;
+        }
+    }, [])
 
     useEffect(() => {
         localStorage.setItem(SCORE_KEY, JSON.stringify({ wins, losses, draws, currentWinStreak }));
@@ -67,40 +103,48 @@ export default function Game() {
         setWinnerCombination(combination);
     }, [board])
 
-    useEffect(() => {
-        if (xIsNext || winner) return;
+    // useEffect(() => {
+    //     if (xIsNext || winner) return;
 
-        const {move, totalPosNum, durationMs} = getNextMove(mode, board);
-        if (move !== null) {
-            const newBoard = board.slice();
-            newBoard[move] = "O"; // AI move
-            setBoard(newBoard);
-            setXIsNext(true);
+    //     const {move, totalPosNum, durationMs} = getNextMove(mode, board);
+    //     if (move !== null) {
+    //         const newBoard = board.slice();
+    //         newBoard[move] = "O"; // AI move
+    //         setBoard(newBoard);
+    //         setXIsNext(true);
 
-            if (mode === "hard") {
-                setTotalPosNum(totalPosNum);
-                setDurationMs(durationMs);
-            }
-        }
-    }, [xIsNext])
+    //         if (mode === "hard") {
+    //             setTotalPosNum(totalPosNum);
+    //             setDurationMs(durationMs);
+    //         }
+    //     }
+    // }, [xIsNext])
 
     const chooseSquare = (index) => {
         // State is an array must create new array
-        if (board[index] || winner) {
+        if (board[index] || winner || !isPlayerTurn) {
             return
         }
 
-        const newBoard = board.slice();
-        newBoard[index] = "X";
-        setBoard(newBoard);
-        setXIsNext(!xIsNext);
+        board[index] = playerRef.current;
+        setBoard([...board]);
+
+        wsRef.current.send(JSON.stringify({
+            type: 'move', 
+            data: {
+                board: board,
+                nextPlayer: playerRef.current === 'X' ? 'O' : 'X'
+            }
+        }))
+
+        // setXIsNext(!xIsNext);
     }
 
     const resetGame = () => {
         const newBoard = Array(9).fill(null)
         setBoard(newBoard)
         setWinner(null)
-        setXIsNext(true)
+        // setXIsNext(true)
         setTotalPosNum(0)
         setDurationMs(0)
     }
@@ -123,9 +167,7 @@ export default function Game() {
             <GameInfo 
                 winner={winner} 
                 resetGame={resetGame} 
-                mode={mode} 
-                setMode={setMode} 
-                xIsNext={xIsNext}
+                isPlayerTurn={isPlayerTurn}
                 totalPosNum={totalPosNum}
                 durationMs={durationMs}    
             />
